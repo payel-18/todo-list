@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
       res.status(200).json({ message: "Sign up successfull" })
     );
   } catch (error) {
-    res.status(200).json({ message: "User already exist" });
+    res.status(400).json({ message: "User already exist" });
   }
 });
 /**
