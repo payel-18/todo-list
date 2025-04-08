@@ -23,7 +23,15 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1", auth);
 app.use("/api/v2", require("./routes/list"));
-// app.use("/api/v2", list);
+
+const path = require("path");
+
+// Serve static frontend build
+app.use(express.static(path.join(__dirname, "build")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 app.listen(1000, () => {
     console.log("Server Started");
