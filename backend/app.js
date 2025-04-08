@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", auth);
-app.use("/api/v2", require("./routes/list"));
+app.use("/api/v2", list);
 
 const path = require("path");
 
