@@ -38,7 +38,7 @@ const Todo = () => {
     if (userId && token) {
       try {
         await axios.post(
-          "https://todo-list-1lk0.onrender.com/api/v2/addTask",
+          `${process.env.REACT_APP_BACKEND_URL}/addTask`,
           {
             title: inputs.title,
             body: inputs.body,
@@ -76,7 +76,7 @@ const Todo = () => {
     }
 
     try {
-      await axios.delete(`https://todo-list-1lk0.onrender.com/api/v2/deleteTask/${cardId}?userId=${userId}`, {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/deleteTask/${cardId}?userId=${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -108,7 +108,7 @@ const Todo = () => {
         return;
       }
 
-      const response = await axios.get(`https://todo-list-1lk0.onrender.com/api/v2/getTasks/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/getTasks/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

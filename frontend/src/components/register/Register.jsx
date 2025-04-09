@@ -29,7 +29,7 @@ const Register = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'https://todo-list-1lk0.onrender.com/api/v1/register',
+        `${process.env.REACT_APP_BACKEND_URL}/register`,
         Inputs
       );
 
