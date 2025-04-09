@@ -1,42 +1,58 @@
 import React, { useState } from 'react';
 import './Register.css';
-import axios from "axios";
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
-  const history = useNavigate(); // For navigating to different routes after registration
+  const history = useNavigate();
 
-  // State to store form input values
-  const [Inputs, setInputs] = useState({ email: "", username: "", password: "" });
+  // Form inputs state
+  const [Inputs, setInputs] = useState({ email: '', username: '', password: '' });
+  const [loading, setLoading] = useState(false);
 
-  // Update state on input change
+  // Input handler
   const change = (e) => {
     const { name, value } = e.target;
     setInputs({ ...Inputs, [name]: value });
   };
 
-  // Handle form submission
+  // Form submit handler
   const submit = async (e) => {
-    e.preventDefault(); // Prevent page refresh
+    e.preventDefault();
 
-    // Send POST request to backend with user inputs
-    await axios.post("http://localhost:1000/api/v1/register", Inputs).then((response) => {
-      if(response.data.message === "User already exist"){
-        alert(response.data.message); // Show error if user exists
+    // Basic validation
+    if (!Inputs.email || !Inputs.username || !Inputs.password) {
+      alert('Please fill in all fields!');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'https://todo-list-1lk0.onrender.com/api/v1/register',
+        Inputs
+      );
+
+      if (response.data.message === 'User already exist') {
+        alert(response.data.message);
       } else {
-        alert(response.data.message); // Show success message
-        setInputs({ email: "", username: "", password: "" }); // Reset form
-        history("/login"); // Navigate to login page
+        alert(response.data.message);
+        setInputs({ email: '', username: '', password: '' });
+        history('/login');
       }
-    });
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong. Please try again!');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="container mt-5 register-form">
       <h2 className="text-center mb-4">Register</h2>
 
-      {/* Registration form */}
-      <form>
+      <form onSubmit={submit}>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Username</label>
           <input
@@ -76,7 +92,9 @@ const Register = () => {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary w-100" onClick={submit}>Register</button>
+        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+          {loading ? 'Registering...' : 'Register'}
+        </button>
       </form>
     </div>
   );

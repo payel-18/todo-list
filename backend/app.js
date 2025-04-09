@@ -22,8 +22,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", auth);
-app.use("/api/v2", list);
-
+app.use("/api/v2", require("./routes/list"));
+// app.use("/api/v2", list);
+const PORT = process.env.PORT || 1000;
 app.listen(1000, () => {
     console.log("Server Started");
     

@@ -9,14 +9,14 @@ const mongoose = require("mongoose");
  * @swagger
  * tags:
  *   name: Todo
- *   description: Todo management
+ *   description: Endpoints for managing tasks (Todo items)
  */
 
 /**
  * @swagger
  * /api/v2/addTask:
  *   post:
- *     summary: Add a task
+ *     summary: Add a new task for a user
  *     tags: [Todo]
  *     security:
  *       - bearerAuth: []
@@ -33,16 +33,21 @@ const mongoose = require("mongoose");
  *             properties:
  *               title:
  *                 type: string
+ *                 example: Buy groceries
  *               body:
  *                 type: string
+ *                 example: Milk, Bread, Eggs
  *               id:
  *                 type: string
  *                 description: User ID
+ *                 example: 64f891fae7ab76852b2ed8d1
  *     responses:
  *       200:
  *         description: Task added successfully
  *       404:
  *         description: User not found
+ *       500:
+ *         description: Server error
  */
 router.post("/addTask", authMiddleware, validateList, async (req, res) => {
   try {
@@ -70,7 +75,7 @@ router.post("/addTask", authMiddleware, validateList, async (req, res) => {
  * @swagger
  * /api/v2/updateTask/{id}:
  *   put:
- *     summary: Update a task
+ *     summary: Update an existing task
  *     tags: [Todo]
  *     security:
  *       - bearerAuth: []
@@ -78,9 +83,9 @@ router.post("/addTask", authMiddleware, validateList, async (req, res) => {
  *       - in: path
  *         name: id
  *         required: true
+ *         description: Task ID to update
  *         schema:
  *           type: string
- *         description: Task ID
  *     requestBody:
  *       required: true
  *       content:
@@ -90,13 +95,17 @@ router.post("/addTask", authMiddleware, validateList, async (req, res) => {
  *             properties:
  *               title:
  *                 type: string
+ *                 example: Updated title
  *               body:
  *                 type: string
+ *                 example: Updated task body
  *     responses:
  *       200:
- *         description: Task updated
+ *         description: Task updated successfully
  *       404:
  *         description: Task not found
+ *       500:
+ *         description: Server error
  */
 router.put("/updateTask/:id", authMiddleware, validateList, async (req, res) => {
   try {
@@ -123,7 +132,7 @@ router.put("/updateTask/:id", authMiddleware, validateList, async (req, res) => 
  * @swagger
  * /api/v2/deleteTask/{id}:
  *   delete:
- *     summary: Delete a task
+ *     summary: Delete a task by ID
  *     tags: [Todo]
  *     security:
  *       - bearerAuth: []
@@ -131,20 +140,22 @@ router.put("/updateTask/:id", authMiddleware, validateList, async (req, res) => 
  *       - name: id
  *         in: path
  *         required: true
+ *         description: Task ID to delete
  *         schema:
  *           type: string
- *         description: Task ID
  *       - name: userId
  *         in: query
  *         required: true
+ *         description: ID of the user who owns the task
  *         schema:
  *           type: string
- *         description: User ID
  *     responses:
  *       200:
  *         description: Task deleted successfully
  *       404:
- *         description: User or task not found
+ *         description: User or Task not found
+ *       500:
+ *         description: Server error
  */
 router.delete("/deleteTask/:id", authMiddleware, async (req, res) => {
   try {
@@ -174,7 +185,7 @@ router.delete("/deleteTask/:id", authMiddleware, async (req, res) => {
  * @swagger
  * /api/v2/getTasks/{id}:
  *   get:
- *     summary: Fetch tasks by user ID
+ *     summary: Get all tasks for a specific user
  *     tags: [Todo]
  *     security:
  *       - bearerAuth: []
@@ -182,14 +193,27 @@ router.delete("/deleteTask/:id", authMiddleware, async (req, res) => {
  *       - name: id
  *         in: path
  *         required: true
+ *         description: User ID to fetch tasks for
  *         schema:
  *           type: string
- *         description: User ID
  *     responses:
  *       200:
- *         description: List of tasks
+ *         description: List of tasks returned successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 list:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Invalid user ID
  *       404:
- *         description: User not found
+ *         description: User not found or no tasks
+ *       500:
+ *         description: Server error
  */
 router.get("/getTasks/:id", authMiddleware, async (req, res) => {
   try {

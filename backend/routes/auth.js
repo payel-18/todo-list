@@ -7,12 +7,12 @@ const jwt = require("jsonwebtoken");
  * @swagger
  * tags:
  *   name: Auth
- *   description: Authentication endpoints
+ *   description: Authentication endpoints (Register and Login)
  */
 
 /**
  * @swagger
- * /api/v1/register:
+ * /api/v2/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
@@ -23,37 +23,59 @@ const jwt = require("jsonwebtoken");
  *           schema:
  *             type: object
  *             required:
+ *               - username
  *               - email
  *               - password
  *             properties:
- *               email:
- *                 type: string
  *               username:
  *                 type: string
+ *                 example: johndoe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
  *               password:
  *                 type: string
+ *                 format: password
+ *                 example: password123
  *     responses:
  *       200:
- *         description: Sign up successfull
+ *         description: User registered successfully
+ *       400:
+ *         description: Email already exists
+ *       500:
+ *         description: Server error
  */
-// Register route
 router.post("/register", async (req, res) => {
   try {
-    const { email, username, password } = req.body;
-    const hashpassword = bcrypt.hashSync(password); // hash the password
-    const user = new User({ email, username, password: hashpassword });
-    await user.save().then(() =>
-      res.status(200).json({ message: "Sign up successfull" })
-    );
+    const { username, email, password } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      username,
+      email,
+      password: hashPassword,
+    });
+
+    await newUser.save();
+    res.status(200).json({ message: "User registered successfully", newUser });
   } catch (error) {
-    res.status(400).json({ message: "User already exist" });
+    console.error("Register Error:", error);
+    res.status(500).json({ message: "Server error while registering user" });
   }
 });
+
 /**
  * @swagger
- * /api/v1/login:
+ * /api/v2/login:
  *   post:
- *     summary: Log in a user
+ *     summary: Login a user and get JWT token
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -67,13 +89,33 @@ router.post("/register", async (req, res) => {
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
+ *                 example: johndoe@example.com
  *               password:
  *                 type: string
+ *                 format: password
+ *                 example: password123
  *     responses:
  *       200:
- *         description: Logged in with token
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 id:
+ *                   type: string
+ *                 username:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       400:
+ *         description: Invalid credentials
+ *       500:
+ *         description: Server error
  */
-// Login route
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -97,4 +139,6 @@ router.post("/login", async (req, res) => {
     res.status(400).json({ message: "Something went wrong" });
   }
 });
+
 module.exports = router;
+

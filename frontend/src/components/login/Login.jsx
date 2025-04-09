@@ -20,7 +20,7 @@ const Login = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:1000/api/v1/login", Inputs);
+      const response = await axios.post("https://todo-list-1lk0.onrender.com/api/v1/login", Inputs);
       const { token, user } = response.data;
 
       // store user info and token

@@ -31,7 +31,7 @@ const Update = ({ display, update, onUpdateSuccess }) => {
     try {
       // Make PUT request to update task
       await axios.put(
-        `http://localhost:1000/api/v2/updateTask/${update._id}`,
+        `https://todo-list-1lk0.onrender.com/api/v2/updateTask/${update._id}`,
         inputs,
         {
           headers: {
