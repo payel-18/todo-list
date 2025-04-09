@@ -3,6 +3,9 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// Handle CORS preflight
+router.options("/register", (req, res) => res.sendStatus(200));
+router.options("/login", (req, res) => res.sendStatus(200));
 /**
  * @swagger
  * tags:
@@ -49,20 +52,14 @@ const jwt = require("jsonwebtoken");
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
+    
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-
-    const newUser = new User({
-      username,
-      email,
-      password: hashPassword,
-    });
-
+    const newUser = new User({ username, email, password: hashPassword });
     await newUser.save();
     res.status(200).json({ message: "User registered successfully", newUser });
   } catch (error) {
@@ -121,10 +118,8 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) return res.status(400).json({ message: "Please sign up" });
 
-    const isPasswordCorrect = bcrypt.compareSync(
-      req.body.password,
-      user.password
-    );
+    const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password);
+
     if (!isPasswordCorrect)
       return res.status(400).json({ message: "Password invalid" });
 
