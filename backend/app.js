@@ -7,11 +7,7 @@ require("dotenv").config();
 require("./conn/conn");
 
 // ✅ CORS config - place it early and correctly
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  credentials: true,
-}));
+app.use(cors());
 
 // ✅ Express body parser
 app.use(express.json());
