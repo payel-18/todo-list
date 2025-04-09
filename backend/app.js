@@ -3,10 +3,12 @@ const cors = require("cors");
 const app = express();
 
 require("dotenv").config();
+// ✅ Mongo connection
+require("./conn/conn");
 
 // ✅ CORS config - place it early and correctly
 app.use(cors({
-  origin: "https://todo-list-rho-beige.vercel.app",
+  origin: process.env.FRONTEND_URL,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true,
 }));
@@ -15,10 +17,9 @@ app.use(cors({
 app.use(express.json());
 
 // ✅ Preflight response
-app.options("*", cors());
+// app.options("*", cors());
 
-// ✅ Mongo connection
-require("./conn/conn");
+
 
 // ✅ Routes
 const auth = require("./routes/auth");
